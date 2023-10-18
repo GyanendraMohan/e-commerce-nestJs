@@ -17,8 +17,8 @@ CREATE TABLE `User` (
 -- CreateTable
 CREATE TABLE `UserAddress` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `address_line1` TEXT NOT NULL,
-    `address_line2` TEXT NOT NULL,
+    `address_line1` VARCHAR(100) NOT NULL,
+    `address_line2` VARCHAR(100) NOT NULL,
     `city` VARCHAR(191) NOT NULL,
     `postal_code` INTEGER NOT NULL,
     `country` VARCHAR(191) NOT NULL,
@@ -47,7 +47,7 @@ CREATE TABLE `UserPayment` (
 CREATE TABLE `Product` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(191) NOT NULL,
-    `description` TEXT NOT NULL,
+    `description` VARCHAR(191) NOT NULL,
     `SKU` VARCHAR(191) NOT NULL,
     `price` INTEGER NOT NULL,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
@@ -62,7 +62,7 @@ CREATE TABLE `Product` (
 CREATE TABLE `Category` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(191) NOT NULL,
-    `description` TEXT NOT NULL,
+    `description` VARCHAR(191) NOT NULL,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `modified_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
@@ -82,7 +82,7 @@ CREATE TABLE `Product_Category` (
 CREATE TABLE `Discount` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(191) NOT NULL,
-    `description` TEXT NOT NULL,
+    `description` VARCHAR(100) NOT NULL,
     `discount_percent` DOUBLE NOT NULL,
     `active` BOOLEAN NOT NULL,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),

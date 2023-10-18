@@ -1,8 +1,5 @@
-// schema.prisma
-
 generator client {
   provider = "prisma-client-js"
-  output   = "./generated/client"
 }
 
 datasource db {
@@ -11,137 +8,135 @@ datasource db {
 }
 
 model User {
-  id             Int             @id @default(autoincrement())
-  username       String
-  email          String          @unique
-  password       String
-  orders         Order[]
-  reviews        Review[]
-  addresses      Address[]
-  paymentMethods PaymentMethod[]
-  wishList       WishList?
-  Return         Return[]
+  id          Int      @id @default(autoincrement())
+  first_name  String
+  last_name   String
+  email       String   @unique
+  telephone   BigInt
+  password    String
+  created_at  DateTime @default(now())
+  modified_at DateTime @default(now())
+  order_details OrderDetails[]
+  user_address  UserAddress?
+  user_payment  UserPayment?
+  @@index([id, email])
 }
 
-model Address {
-  id         Int    @id @default(autoincrement())
-  userId     Int
-  user       User   @relation(fields: [userId], references: [id])
-  street     String
-  city       String
-  state      String
-  postalCode String
-  country    String
-
-  @@unique([userId, street, city, state, postalCode, country])
+model UserAddress {
+  id            Int    @id @default(autoincrement())
+  address_line1 String @db.VarChar(100)
+  address_line2 String @db.VarChar(100)
+  city          String
+  postal_code   Int
+  country       String
+  telephone     BigInt
+  mobile        BigInt
+  user    User @relation(fields: [user_id], references: [id])
+  user_id Int  @unique
 }
 
-model PaymentMethod {
-  id         Int    @id @default(autoincrement())
-  userId     Int
-  user       User   @relation(fields: [userId], references: [id])
-  cardType   String
-  cardNumber String
-
-  @@unique([userId, cardNumber])
-}
-
-model WishList {
-  id       Int       @id @default(autoincrement())
-  userId   Int
-  user     User      @relation(fields: [userId], references: [id])
-  products Product[]
-
-  @@unique([userId])
-}
-
-model Category {
-  id       Int       @id @default(autoincrement())
-  name     String
-  products Product[]
+model UserPayment {
+  id           Int      @id @default(autoincrement())
+  payment_type String
+  provider     String
+  account_no   BigInt
+  expiry       DateTime
+  user    User @relation(fields: [user_id], references: [id])
+  user_id Int  @unique
 }
 
 model Product {
-  id          Int         @id @default(autoincrement())
-  name        String      @unique
+  id          Int      @id @default(autoincrement())
+  name        String
   description String
-  price       Float
-  stock       Int
-  categoryId  Int
-  category    Category    @relation(fields: [categoryId], references: [id])
-  reviews     Review[]
-  inventories Inventory[]
-
-  WishList   WishList? @relation(fields: [wishListId], references: [id])
-  wishListId Int?
-  Order      Order?    @relation(fields: [orderId], references: [id])
-  orderId    Int?
+  SKU         String
+  price       Int
+  created_at  DateTime @default(now())
+  modified_at DateTime @default(now())
+  inventory    Inventory @relation(fields: [inventory_id], references: [id])
+  inventory_id Int
+  discount    Discount @relation(fields: [discount_id], references: [id])
+  discount_id Int
+  categories Product_Category[]
+  orders OrderItems[]
+  carts CartItems[]
 }
 
-model Review {
-  id        Int     @id @default(autoincrement())
-  text      String
-  rating    Int
-  userId    Int
-  productId Int
-  user      User    @relation(fields: [userId], references: [id])
-  product   Product @relation(fields: [productId], references: [id])
+model Category {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String
+  created_at  DateTime @default(now())
+  modified_at DateTime @default(now())
+  products Product_Category[]
+}
 
-  @@unique([userId, productId])
+model Product_Category {
+  id Int @id @default(autoincrement())
+  product    Product @relation(fields: [product_id], references: [id])
+  product_id Int
+  category    Category @relation(fields: [category_id], references: [id])
+  category_id Int
+}
+
+model Discount {
+  id               Int      @id @default(autoincrement())
+  name             String
+  description      String   @db.VarChar(100)
+  discount_percent Float
+  active           Boolean
+  created_at       DateTime @default(now())
+  modified_at      DateTime @default(now())
+  product Product[]
 }
 
 model Inventory {
-  id        Int     @id @default(autoincrement())
-  warehouse String
-  location  String
-  stock     Int
-  productId Int
-  product   Product @relation(fields: [productId], references: [id])
-
-  @@unique([warehouse, location, productId])
+  id          Int       @id @default(autoincrement())
+  quantity    BigInt
+  created_at  DateTime  @default(now())
+  modified_at DateTime  @default(now())
+  Product     Product[]
 }
 
-model Order {
-  id        Int        @id @default(autoincrement())
-  userId    Int
-  user      User       @relation(fields: [userId], references: [id])
-  products  Product[]
-  orderDate DateTime
-  status    String
-  Shipping  Shipping[]
-  Return    Return[]
-
-  @@unique([userId, orderDate])
+model OrderDetails {
+  id          Int      @id @default(autoincrement())
+  total       BigInt
+  created_at  DateTime @default(now())
+  modified_at DateTime @default(now())
+  user    User @relation(fields: [user_id], references: [id])
+  user_id Int
+  transaction_details TransactionDetails @relation(fields: [transaction_id], references: [id])
+  transaction_id      Int                @unique
+  order_items OrderItems[]
 }
 
-model Coupon {
-  id        Int      @id @default(autoincrement())
-  code      String   @unique
-  discount  Float
-  expiresAt DateTime
+model OrderItems {
+  id          Int      @id @default(autoincrement())
+  quantity    BigInt
+  created_at  DateTime @default(now())
+  modified_at DateTime @default(now())
+  order_details OrderDetails @relation(fields: [order_id], references: [id])
+  order_id      Int
+  product    Product @relation(fields: [product_id], references: [id])
+  product_id Int
 }
 
-model Shipping {
-  id                Int      @id @default(autoincrement())
-  orderId           Int
-  order             Order    @relation(fields: [orderId], references: [id])
-  method            String
-  trackingCode      String
-  estimatedDelivery DateTime
-
-  @@unique([orderId, trackingCode])
+model CartItems {
+  id          Int      @id @default(autoincrement())
+  quntity     BigInt
+  created_at  DateTime @default(now())
+  modified_at DateTime @default(now())
+  product    Product @relation(fields: [product_id], references: [id])
+  product_id Int
 }
 
-model Return {
-  id      Int    @id @default(autoincrement())
-  userId  Int
-  user    User   @relation(fields: [userId], references: [id])
-  orderId Int
-  order   Order  @relation(fields: [orderId], references: [id])
-  reason  String
-  status  String
-
-  @@unique([userId, orderId])
+model TransactionDetails {
+  id          Int      @id @default(autoincrement())
+  order_id    Int
+  amount      BigInt
+  provider    String
+  status      String
+  created_at  DateTime @default(now())
+  modified_at DateTime @default(now())
+  order_details OrderDetails?
 }
-
-// You can also add models for administrative purposes, such as managing products, categories, and users.
