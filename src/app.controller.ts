@@ -5,9 +5,9 @@ import {
   Req,
   Request,
   UseInterceptors,
-} from '@nestjs/common';
-import { AppService } from './app.service';
-import { LoggingInterceptor } from './interceptors/logging.interceptor';
+} from "@nestjs/common";
+import { AppService } from "./app.service";
+import { LoggingInterceptor } from "./interceptors/logging.interceptor";
 
 @Controller()
 @UseInterceptors(LoggingInterceptor)

@@ -8,17 +8,18 @@ datasource db {
 }
 
 model User {
-  id          Int      @id @default(autoincrement())
-  first_name  String
-  last_name   String
-  email       String   @unique
-  telephone   BigInt
-  password    String
-  created_at  DateTime @default(now())
-  modified_at DateTime @default(now())
+  id            Int            @id @default(autoincrement())
+  first_name    String
+  last_name     String
+  email         String         @unique
+  telephone     BigInt
+  password      String
+  created_at    DateTime       @default(now())
+  modified_at   DateTime       @default(now())
   order_details OrderDetails[]
   user_address  UserAddress?
   user_payment  UserPayment?
+
   @@index([id, email])
 }
 
@@ -31,8 +32,8 @@ model UserAddress {
   country       String
   telephone     BigInt
   mobile        BigInt
-  user    User @relation(fields: [user_id], references: [id])
-  user_id Int  @unique
+  user          User   @relation(fields: [user_id], references: [id])
+  user_id       Int    @unique
 }
 
 model UserPayment {
@@ -41,53 +42,53 @@ model UserPayment {
   provider     String
   account_no   BigInt
   expiry       DateTime
-  user    User @relation(fields: [user_id], references: [id])
-  user_id Int  @unique
+  user         User     @relation(fields: [user_id], references: [id])
+  user_id      Int      @unique
 }
 
 model Product {
-  id          Int      @id @default(autoincrement())
-  name        String
-  description String
-  SKU         String
-  price       Int
-  created_at  DateTime @default(now())
-  modified_at DateTime @default(now())
-  inventory    Inventory @relation(fields: [inventory_id], references: [id])
+  id           Int                @id @default(autoincrement())
+  name         String
+  description  String
+  SKU          String
+  price        Int
+  created_at   DateTime           @default(now())
+  modified_at  DateTime           @default(now())
+  inventory    Inventory          @relation(fields: [inventory_id], references: [id])
   inventory_id Int
-  discount    Discount @relation(fields: [discount_id], references: [id])
-  discount_id Int
-  categories Product_Category[]
-  orders OrderItems[]
-  carts CartItems[]
+  discount     Discount           @relation(fields: [discount_id], references: [id])
+  discount_id  Int
+  categories   Product_Category[]
+  orders       OrderItems[]
+  carts        CartItems[]
 }
 
 model Category {
-  id          Int      @id @default(autoincrement())
+  id          Int                @id @default(autoincrement())
   name        String
   description String
-  created_at  DateTime @default(now())
-  modified_at DateTime @default(now())
-  products Product_Category[]
+  created_at  DateTime           @default(now())
+  modified_at DateTime           @default(now())
+  products    Product_Category[]
 }
 
 model Product_Category {
-  id Int @id @default(autoincrement())
-  product    Product @relation(fields: [product_id], references: [id])
-  product_id Int
+  id          Int      @id @default(autoincrement())
+  product     Product  @relation(fields: [product_id], references: [id])
+  product_id  Int
   category    Category @relation(fields: [category_id], references: [id])
   category_id Int
 }
 
 model Discount {
-  id               Int      @id @default(autoincrement())
+  id               Int       @id @default(autoincrement())
   name             String
-  description      String   @db.VarChar(100)
+  description      String    @db.VarChar(100)
   discount_percent Float
   active           Boolean
-  created_at       DateTime @default(now())
-  modified_at      DateTime @default(now())
-  product Product[]
+  created_at       DateTime  @default(now())
+  modified_at      DateTime  @default(now())
+  product          Product[]
 }
 
 model Inventory {
@@ -99,26 +100,26 @@ model Inventory {
 }
 
 model OrderDetails {
-  id          Int      @id @default(autoincrement())
-  total       BigInt
-  created_at  DateTime @default(now())
-  modified_at DateTime @default(now())
-  user    User @relation(fields: [user_id], references: [id])
-  user_id Int
+  id                  Int                @id @default(autoincrement())
+  total               BigInt
+  created_at          DateTime           @default(now())
+  modified_at         DateTime           @default(now())
+  user                User               @relation(fields: [user_id], references: [id])
+  user_id             Int
   transaction_details TransactionDetails @relation(fields: [transaction_id], references: [id])
   transaction_id      Int                @unique
-  order_items OrderItems[]
+  order_items         OrderItems[]
 }
 
 model OrderItems {
-  id          Int      @id @default(autoincrement())
-  quantity    BigInt
-  created_at  DateTime @default(now())
-  modified_at DateTime @default(now())
+  id            Int          @id @default(autoincrement())
+  quantity      BigInt
+  created_at    DateTime     @default(now())
+  modified_at   DateTime     @default(now())
   order_details OrderDetails @relation(fields: [order_id], references: [id])
   order_id      Int
-  product    Product @relation(fields: [product_id], references: [id])
-  product_id Int
+  product       Product      @relation(fields: [product_id], references: [id])
+  product_id    Int
 }
 
 model CartItems {
@@ -126,17 +127,17 @@ model CartItems {
   quntity     BigInt
   created_at  DateTime @default(now())
   modified_at DateTime @default(now())
-  product    Product @relation(fields: [product_id], references: [id])
-  product_id Int
+  product     Product  @relation(fields: [product_id], references: [id])
+  product_id  Int
 }
 
 model TransactionDetails {
-  id          Int      @id @default(autoincrement())
-  order_id    Int
-  amount      BigInt
-  provider    String
-  status      String
-  created_at  DateTime @default(now())
-  modified_at DateTime @default(now())
+  id            Int           @id @default(autoincrement())
+  order_id      Int
+  amount        BigInt
+  provider      String
+  status        String
+  created_at    DateTime      @default(now())
+  modified_at   DateTime      @default(now())
   order_details OrderDetails?
 }
