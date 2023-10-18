@@ -10,7 +10,7 @@ import { Observable, tap } from "rxjs";
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
-    console.log("Before reaching the request handler");
+    // console.log("Before reaching the request handler");
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const startTime = Date.now();
 
