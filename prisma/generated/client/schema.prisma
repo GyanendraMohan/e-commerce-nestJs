@@ -1,0 +1,153 @@
+// schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated/client"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             Int             @id @default(autoincrement())
+  username       String
+  email          String          @unique
+  password       String
+  orders         Order[]
+  reviews        Review[]
+  addresses      Address[]
+  paymentMethods PaymentMethod[]
+  wishList       WishList?
+  // Add other user-related fields as needed.
+  Return         Return[]
+}
+
+model Address {
+  id         Int    @id @default(autoincrement())
+  userId     Int
+  user       User   @relation(fields: [userId], references: [id])
+  street     String
+  city       String
+  state      String
+  postalCode String
+  country    String
+
+  @@unique([userId, street, city, state, postalCode, country])
+}
+
+model PaymentMethod {
+  id         Int    @id @default(autoincrement())
+  userId     Int
+  user       User   @relation(fields: [userId], references: [id])
+  cardType   String
+  cardNumber String
+  // Add fields for expiration date, CVV, and other payment info.
+
+  @@unique([userId, cardNumber])
+}
+
+model WishList {
+  id       Int       @id @default(autoincrement())
+  userId   Int
+  user     User      @relation(fields: [userId], references: [id])
+  products Product[]
+
+  @@unique([userId])
+}
+
+model Category {
+  id       Int       @id @default(autoincrement())
+  name     String
+  products Product[]
+}
+
+model Product {
+  id          Int         @id @default(autoincrement())
+  name        String      @unique
+  description String
+  price       Float
+  stock       Int
+  categoryId  Int
+  category    Category    @relation(fields: [categoryId], references: [id])
+  reviews     Review[]
+  inventories Inventory[]
+
+  // @@unique([name])  // Removed this unique constraint since name is already marked as unique
+  WishList   WishList? @relation(fields: [wishListId], references: [id])
+  wishListId Int?
+  Order      Order?    @relation(fields: [orderId], references: [id])
+  orderId    Int?
+}
+
+model Review {
+  id        Int     @id @default(autoincrement())
+  text      String
+  rating    Int
+  userId    Int
+  productId Int
+  user      User    @relation(fields: [userId], references: [id])
+  product   Product @relation(fields: [productId], references: [id])
+
+  @@unique([userId, productId])
+}
+
+model Inventory {
+  id        Int     @id @default(autoincrement())
+  warehouse String
+  location  String
+  stock     Int
+  productId Int
+  product   Product @relation(fields: [productId], references: [id])
+
+  @@unique([warehouse, location, productId])
+}
+
+model Order {
+  id        Int        @id @default(autoincrement())
+  userId    Int
+  user      User       @relation(fields: [userId], references: [id])
+  products  Product[]
+  orderDate DateTime
+  status    String
+  // Add other order-related fields like shipping address, total price, etc.
+  Shipping  Shipping[]
+  Return    Return[]
+
+  @@unique([userId, orderDate])
+}
+
+model Coupon {
+  id        Int      @id @default(autoincrement())
+  code      String   @unique
+  discount  Float
+  expiresAt DateTime
+}
+
+model Shipping {
+  id                Int      @id @default(autoincrement())
+  orderId           Int
+  order             Order    @relation(fields: [orderId], references: [id])
+  method            String
+  trackingCode      String
+  estimatedDelivery DateTime
+  // Add fields for shipping address, carrier, and other shipping info.
+
+  @@unique([orderId, trackingCode])
+}
+
+model Return {
+  id      Int    @id @default(autoincrement())
+  userId  Int
+  user    User   @relation(fields: [userId], references: [id])
+  orderId Int
+  order   Order  @relation(fields: [orderId], references: [id])
+  reason  String
+  status  String // Processing, Approved, Rejected, etc.
+  // Add fields for return request details.
+
+  @@unique([userId, orderId])
+}
+
+// You can also add models for administrative purposes, such as managing products, categories, and users.
